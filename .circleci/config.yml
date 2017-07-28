@@ -1,21 +1,23 @@
-#
-# Build configuration for Circle CI
-#
-
-general:
+eneral:
     artifacts:
         - /home/ubuntu/Test/app/build/outputs/apk/
 
 machine:
+    java:
+        version: oraclejdk8
     environment:
         ANDROID_HOME: /usr/local/android-sdk-linux
 
+
 dependencies:
-    override:
-        - echo y | android update sdk --no-ui --all --filter tools,platform-tools,build-tools-19.1.0,android-19,extra-google-m2repository,extra-google-google_play_services,extra-android-support
-        - sudo ANDROID_HOME=/usr/local/android-sdk-linux ./gradlew dependencies
+    pre:
+        - echo y | android update sdk --no-ui --all --filter tools,platform-tools,extra-google-m2repository,extra-google-google_play_services,extra-android-support,extra-android-m2repository,android-24
+        - echo y | android update sdk --no-ui --all --filter build-tools-24.0.1
+    cache_directories:
+        - /usr/local/android-sdk-linux/tools
+        - /usr/local/android-sdk-linux/build-tools/24.0.1
 
 test:
     override:
-        - (./gradlew assemble):
-            timeout: 360
+        - ./gradlew assemble
+        - cp -r app/build/outputs $CIRCLE_ARTIFACTS
